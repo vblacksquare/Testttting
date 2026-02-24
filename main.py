@@ -1,5 +1,7 @@
 
 import asyncio
+import json
+
 from parser import Parser
 
 from config import get_config
@@ -11,9 +13,13 @@ async def main():
     config = get_config()
     setup_logger(config.logger.path, config.logger.level)
 
+    with open(config.parser.headers, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
     async with Parser(
         root=config.parser.root,
-        rps_limit=config.parser.rps_limit
+        rps_limit=config.parser.rps_limit,
+        headers=data
     ) as parser:
 
         categories = await parser.get_categories()

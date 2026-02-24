@@ -9,6 +9,7 @@ class Parser(BaseModel):
     root: str
     rps_limit: int
     results_path: str
+    headers: str
 
 
 class Logger(BaseModel):

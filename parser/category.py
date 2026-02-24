@@ -14,9 +14,10 @@ from loguru import logger
 class CategoryParser(ABC):
     path: str = "/base"
 
-    def __init__(self, root: str, session: aiohttp.ClientSession):
+    def __init__(self, root: str, session: aiohttp.ClientSession, headers: dict):
         self.log = logger.bind(classname=self.__class__.__name__)
         self._root = root
+        self._headers = headers
         self._session: aiohttp.ClientSession = session
 
     @abstractmethod
@@ -49,7 +50,8 @@ class SmartfonyParser(CategoryParser):
 
     async def parse_product(self, product: Product) -> None:
         async with self._session.get(
-            url=''.join((self._root, product.path))
+            url=''.join((self._root, product.path)),
+            headers=self._headers
         ) as response:
             self.log.debug(response)
             html = await response.text()
@@ -87,7 +89,8 @@ class SmartfonyParser(CategoryParser):
 
         async with self._session.get(
             url=''.join((self._root, self.path)),
-            params={"page": page} if page > 1 else None
+            params={"page": page} if page > 1 else None,
+            headers=self._headers
         ) as response:
 
             self.log.debug(response)

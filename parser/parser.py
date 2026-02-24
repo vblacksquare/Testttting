@@ -12,11 +12,12 @@ from .category import CategoryParser
 
 
 class Parser:
-    def __init__(self, root: str, rps_limit: int):
+    def __init__(self, root: str, rps_limit: int, headers: dict):
         self.log = logger.bind(classname=self.__class__.__name__)
 
         self._session: aiohttp.ClientSession = None
         self._root = root
+        self._headers = headers
         self.rps_limit = rps_limit
 
     def start(self) -> None:
@@ -65,7 +66,7 @@ class Parser:
 
         for category_parser in category_parsers:
             if category_parser.path == category.path:
-                target_parser = category_parser(session=self._session, root=self._root)
+                target_parser = category_parser(session=self._session, root=self._root, headers=self._headers)
                 break
 
         if target_parser is None:

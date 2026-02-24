@@ -1,2 +1,6 @@
 aiohttp
 loguru
+bs4
+aiolimiter
+pydantic
+pydantic-settings

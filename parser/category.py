@@ -62,6 +62,12 @@ class SmartfonyParser(CategoryParser):
         page_data = json.loads(page_data_el.get_text())
         product_data = page_data["props"]["pageProps"]["initialReduxState"]["product"]["product"]
 
+        price = product_data["price"]["firstPrice"]
+        promo_price = product_data["price"]["sellingPrice"]
+
+        if price == promo_price:
+            promo_price = None
+
         product.fields.update({
             "brand": product_data.get("brandName"),
             "model": None,
@@ -69,8 +75,8 @@ class SmartfonyParser(CategoryParser):
             "status": "new",
             "color": None,
             "storage": None,
-            "price": product_data["price"]["firstPrice"],
-            "promo_price": product_data["price"]["sellingPrice"]
+            "price": price,
+            "promo_price": promo_price
         })
 
         for row in product_data["properties"]:
@@ -81,7 +87,12 @@ class SmartfonyParser(CategoryParser):
                 product.fields["color"] = row["items"][0]["value"]
 
             elif row["slug"] == "vbudovana-pamiat-smartfony":
-                product.fields["storage"] = int(row["items"][0]["value"].split()[0])
+                parts = row["items"][0]["value"].split()
+                k = {
+                    "ГБ": 1,
+                    "TB": 1024
+                }.get(parts[1].upper())
+                product.fields["storage"] = int(parts[0]) * k
 
     async def _get_full_products_page(self, page: int) -> tuple[list[Product], int]:
         products = []
